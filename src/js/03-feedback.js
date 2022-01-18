@@ -30,7 +30,6 @@ function getStoredFormData() {
     formData.email = storedFormData.email;
   }
 }
-
 function onFormSubmit(event) {
   event.preventDefault();
   event.currentTarget.reset();
