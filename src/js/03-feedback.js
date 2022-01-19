@@ -1,37 +1,35 @@
 import throttle from 'lodash.throttle';
 
 const STORAGE_KEY = 'feedback-form-state';
-
-const refs = {
-  form: document.querySelector('.feedback-form'),
-  input: document.querySelector('.feedback-form input'),
-  textarea: document.querySelector('.feedback-form textarea'),
-};
-
-const formData = {};
-getStoredFormData();
-
-refs.textarea.addEventListener('input', throttle(onInput, 500));
-refs.input.addEventListener('input', throttle(onInput, 500));
-refs.form.addEventListener('submit', onFormSubmit);
-
-function onInput(event) {
-  formData[event.target.name] = event.target.value;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+const form = document.querySelector('.feedback-form');
+form.addEventListener('input', throttle(onFormInput, 500));
+form.addEventListener('submit', onFormSubmit);
+populateForm();
+function onFormInput() {
+  const formData = { email: form.email.value, message: form.message.value };
+  const formDataStringified = JSON.stringify(formData);
+  localStorage.setItem(STORAGE_KEY, formDataStringified);
 }
-
-function getStoredFormData() {
-  const storedFormData = JSON.parse(localStorage.getItem(STORAGE_KEY));
-
-  if (storedFormData) {
-    refs.textarea.value = storedFormData.message;
-    formData.message = storedFormData.message;
-    refs.input.value = storedFormData.email;
-    formData.email = storedFormData.email;
+function onFormSubmit(e) {
+  e.preventDefault();
+  if (e.target.email.value === '') {
+    alert('Please enter your email');
+    return;
   }
-}
-function onFormSubmit(event) {
-  event.preventDefault();
-  event.currentTarget.reset();
+  if (e.target.message.value === '') {
+    alert('Please type your message');
+    return;
+  }
+  const formDataSubmit = { email: form.email.value, message: form.message.value };
+  console.log(formDataSubmit);
+  e.currentTarget.reset();
   localStorage.removeItem(STORAGE_KEY);
+}
+function populateForm() {
+  const storageValue = localStorage.getItem(STORAGE_KEY);
+  const storageValueParsed = JSON.parse(storageValue);
+  if (storageValueParsed) {
+    form.email.value = storageValueParsed.email;
+    form.message.value = storageValueParsed.message;
+  }
 }
